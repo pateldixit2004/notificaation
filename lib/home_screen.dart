@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notificaation/custom_widget/text.dart';
 import 'package:notificaation/noti.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -52,6 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+
+            CustomText(text: 'Dixit',style: TextStyle(fontSize: 50,color: Colors.pink),textAlign: TextAlign.right,),
             Expanded(
               child: ListView.builder(
                 itemBuilder: (context, index) {
