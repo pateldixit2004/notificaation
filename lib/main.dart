@@ -223,10 +223,14 @@
 // }
 
 import 'dart:developer';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MyApp());
@@ -244,12 +248,39 @@ class MyApp extends StatelessWidget {
 List list = [1, 2, 3, 5];
 List l1 = [];
 
+class model {
+  String? img, price, name;
+
+  model({this.img, this.price, this.name});
+}
+
+List<model> g_list = [
+  model(name: "data", img: 'assets/images/bg.jpg', price: "100"),
+  model(name: "data", img: 'assets/images/logo.svg', price: "100"),
+  model(name: "data", img: 'assets/images/bg.jpg', price: "100"),
+  model(name: "data", img: 'assets/images/logo.svg', price: "100"),
+];
+
+
+class Controller extends GetxController
+{
+  var selectedFile = Rx<XFile?>(null);
+
+  Future<void> pickImage() async {
+    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      selectedFile.value = pickedFile;
+    }
+  }
+}
+
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Controller controller=Get.put(Controller());
   int counter = 0;
   TextEditingController _textEditingController = TextEditingController();
 
@@ -267,6 +298,23 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                controller.pickImage();
+              },
+              child: Text("Image picker"),
+            ),
+            Obx(
+                  () => SizedBox(
+                height: 100,
+                width: 100,
+                child: (controller.selectedFile.value != null)
+                    ? (kIsWeb
+                    ? Image.network(controller.selectedFile.value!.path)
+                    : Image.file(File(controller.selectedFile.value!.path)))
+                    : Image.asset("assets/images/bg.jpg"),
+              ),
+            ),
             TextField(
               controller: _textEditingController,
               decoration: InputDecoration(
@@ -310,15 +358,15 @@ class _MyHomePageState extends State<MyHomePage> {
             //   ),
             // ),
             Expanded(
-                child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: min(currentCount, minCount),
-                  childAspectRatio: 3/2,
-                  mainAxisExtent: MediaQuery.of(context).size.width * 0.2,
-                  mainAxisSpacing: 3,
-                  crossAxisSpacing: 2),
-              itemBuilder: (context, index) {
-                return Container(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: min(currentCount, minCount),
+                    childAspectRatio: 3 / 2,
+                    mainAxisExtent: MediaQuery.of(context).size.width * 0.21,
+                    mainAxisSpacing: 3,
+                    crossAxisSpacing: 2),
+                itemBuilder: (context, index) {
+                  return Container(
                     color: Colors.red,
                     alignment: Alignment.center,
                     child: Column(
@@ -326,19 +374,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       // crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(
+
                           child: Image.network(
-                            "https://rukminim2.flixcart.com/image/416/416/ksxjs7k0/keyboard/desktop-keyboard/c/y/b/zeb-k20-zebronics-original-imag6dug5zssv72s.jpeg",
-                          width: 200,
-                            fit: BoxFit.fill,
+                            // "https://rukminim2.flixcart.com/image/416/416/ksxjs7k0/keyboard/desktop-keyboard/c/y/b/zeb-k20-zebronics-original-imag6dug5zssv72s.jpeg",
+                            '${g_list[index].img}',
+                            height: 150 ,
+                            width: 100,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        Text("data"),
+                        Text("${g_list[index].name}"),
                         Text("data+++"),
                       ],
-                    ));
-              },
-              itemCount: 10,
-            ))
+                    ),
+                  );
+                },
+                itemCount: g_list.length,
+              ),
+            ),
           ],
         ),
       ),
